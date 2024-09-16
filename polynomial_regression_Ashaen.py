@@ -7,13 +7,13 @@ from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
 
-# Example data
+#Load the pre-processed dataframe
 df = processing_tri.cleanData
 
-# Normalize target variable (if needed)
+# Scale the Price
 df.loc[:, 'Price($)'] = df['Price($)'] / 1000000
 
-# Example features and target variable
+# Define Features and target variable
 X = df[['Number of Bedrooms', 'Bathroom', 'Landsize']].values
 y = df['Price($)'].values
 
@@ -24,7 +24,7 @@ X_scaled = scaler.fit_transform(X)
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-alpha = 1.0  # You can adjust this parameter
+alpha = 1.0
 model = Ridge(alpha=alpha)
 
 # Fit the model
@@ -37,6 +37,7 @@ y_pred = model.predict(X_test)
 mse = mean_squared_error(y_test, y_pred)
 print(f'Ridge Regression Mean Squared Error: {mse:.2f}')
 
+#Visualise coefficients and feature indexes on a bar chart
 plt.bar(range(len(model.coef_)), model.coef_)
 plt.xlabel('Feature Index')
 plt.ylabel('Coefficient Value')
