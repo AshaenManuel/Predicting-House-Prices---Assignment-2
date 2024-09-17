@@ -40,3 +40,18 @@ print('Mean Squared Error: %.2f' % mean_squared_error(y_test, y_pred))
 print('Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(y_test, y_pred)))
 print('R^2 Score: %.2f' % r2_score(y_test, y_pred))
 
+# Visualize the results for just Bedrooms as a feature
+plt.figure(figsize=(10, 6))
+X = df[['Distance']]
+X_scaled = scaler.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+model = svm.SVR()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+plt.scatter(X_test, y_test, color='black', label='Actual values')
+plt.plot(X_test, y_pred, color='blue', linewidth=3, label='Predicted values')
+plt.xlabel('Scaled Distance from CBD')
+plt.ylabel('Price in Million($)')
+plt.title('Supported Vector Regression on Melbourne Housing Dataset')
+plt.legend()
+plt.show()
