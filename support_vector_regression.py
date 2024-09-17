@@ -3,7 +3,7 @@ import math
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
 from sklearn import svm
 
@@ -39,6 +39,7 @@ y_pred = model.predict(X_test)
 print('Mean Squared Error: %.2f' % mean_squared_error(y_test, y_pred))
 print('Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(y_test, y_pred)))
 print('R^2 Score: %.2f' % r2_score(y_test, y_pred))
+print('Mean Absolute Error: %.2f' % mean_absolute_error(y_test, y_pred))
 
 # Visualize the results for just Bedrooms as a feature
 plt.figure(figsize=(10, 6))
