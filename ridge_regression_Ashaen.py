@@ -10,28 +10,49 @@ from sklearn.preprocessing import StandardScaler
 df = pd.read_csv("finalData.csv")
 
 # Define Features and target variable
-X = df[['Bathroom', 'Number of Rooms', 'Distance', 'Number of Bedroom', 'YearBuilt']].values
+Xint = df[['Bathroom', 'Number of Rooms', 'Distance', 'Number of Bedroom', 'YearBuilt']].values
 y = df['Price in $1,000,000'].values
 
 # Scale features
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+Xint_scaled = scaler.fit_transform(Xint)
 
 # Split data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+Xint_train, Xint_test, yint_train, yint_test = train_test_split(Xint_scaled, y, test_size=0.2, random_state=42)
 
 alpha = 1.0
 model = Ridge(alpha=alpha)
 
 # Fit the model
-model.fit(X_train, y_train)
+model.fit(Xint_train, yint_train)
 
 # Make predictions
-y_pred = model.predict(X_test)
+yint_pred = model.predict(Xint_test)
 
 # Evaluate the model
-mse = mean_squared_error(y_test, y_pred)
-print(f'Ridge Regression Mean Squared Error: {mse:.2f}')
+mse = mean_squared_error(yint_test, yint_pred)
+print('Initial Evaluation:')
+print(f'Initial Ridge Regression Mean Squared Error: {mse:.2f}')
+print('\n')
+
+#Repeating initial process to show improvements using additional dataset
+Xfin = df[['Bathroom', 'Number of Rooms', 'Distance', 'Number of Bedroom', 'YearBuilt', 'Population', 'Education Score', 'State Rank']].values
+
+scaler = StandardScaler()
+Xfin_scaled = scaler.fit_transform(Xfin)
+
+Xfin_train, Xfin_test, yfin_train, yfin_test = train_test_split(Xfin_scaled, y, test_size=0.2, random_state=42)
+
+alpha = 1.0
+model = Ridge(alpha=alpha)
+
+model.fit(Xfin_train, yfin_train)
+
+yfin_pred = model.predict(Xfin_test)
+
+mse = mean_squared_error(yfin_test, yfin_pred)
+print('Final Evaluation:')
+print(f'Final Ridge Regression Mean Squared Error: {mse:.2f}')
 
 #Visualise coefficients and feature indexes on a bar chart
 plt.bar(range(len(model.coef_)), model.coef_)
