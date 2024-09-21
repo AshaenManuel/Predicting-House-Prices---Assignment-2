@@ -1,4 +1,3 @@
-import processing_tri
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,14 +7,11 @@ from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
 
 #Load the pre-processed dataframe
-df = processing_tri.cleanData
-
-# Scale the Price
-df.loc[:, 'Price($)'] = df['Price($)'] / 1000000
+df = pd.read_csv("finalData.csv")
 
 # Define Features and target variable
-X = df[['Number of Bedrooms', 'Bathroom', 'Landsize']].values
-y = df['Price($)'].values
+X = df[['Bathroom', 'Number of Rooms', 'Distance', 'Number of Bedroom', 'YearBuilt']].values
+y = df['Price in $1,000,000'].values
 
 # Scale features
 scaler = StandardScaler()
