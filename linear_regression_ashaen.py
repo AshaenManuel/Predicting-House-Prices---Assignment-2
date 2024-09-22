@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
+import math
 
 # Load and preprocess data
 df = pd.read_csv("finalData.csv")
@@ -32,6 +33,7 @@ yint_pred = model.predict(Xint_test)
 # Print model performance
 print("Initial Evaluation:")
 print('Initial Mean Squared Error: %.2f' % mean_squared_error(yint_test, yint_pred))
+print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
 print('Initial R^2 Score: %.2f' % r2_score(yint_test, yint_pred))
 print('Initial Mean Absolute Error: %.2f' % mean_absolute_error(yint_test, yint_pred))
 print('\n')
@@ -50,10 +52,11 @@ yfin_pred = model.predict(Xfin_test)
 
 print("Final Evaluation:")
 print('Final Mean Squared Error: %.2f' % mean_squared_error(yfin_test, yfin_pred))
+print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
 print('Final R^2 Score: %.2f' % r2_score(yfin_test, yfin_pred))
 print('Final Mean Absolute Error: %.2f' % mean_absolute_error(yfin_test, yfin_pred))
 
-# Visualize the results for just Bedrooms as a feature
+# Visualize the results for just Distance as a feature
 plt.figure(figsize=(10, 6))
 features = ['Distance']
 X = df[features]
