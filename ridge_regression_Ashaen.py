@@ -1,23 +1,28 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
+import math
 
 #Load the pre-processed dataframe
 df = pd.read_csv("finalData.csv")
 
-# Define Features and target variable
-Xint = df[['Bathroom', 'Number of Rooms', 'Distance', 'Number of Bedroom', 'YearBuilt']].values
-y = df['Price in $1,000,000'].values
-
-# Scale features
+# Scale all features using StandardScaler
 scaler = StandardScaler()
+
+# Define features and target
+features = ['Bathroom', 'Number of Rooms', 'Distance', 'Number of Bedroom', 'YearBuilt']
+Xint = df[features]
 Xint_scaled = scaler.fit_transform(Xint)
 
-# Split data into training and testing sets
+Xint_scaled = scaler.fit_transform(Xint)
+
+# Scale the target (Price)
+y = df['Price in $1,000,000']
+
+# Split the dataset into training and testing sets
 Xint_train, Xint_test, yint_train, yint_test = train_test_split(Xint_scaled, y, test_size=0.2, random_state=42)
 
 alpha = 1.0
@@ -29,10 +34,12 @@ model.fit(Xint_train, yint_train)
 # Make predictions
 yint_pred = model.predict(Xint_test)
 
-# Evaluate the model
-mse = mean_squared_error(yint_test, yint_pred)
-print('Initial Evaluation:')
-print(f'Initial Ridge Regression Mean Squared Error: {mse:.2f}')
+# Print model performance
+print("Initial Evaluation:")
+print('Initial Mean Squared Error: %.2f' % mean_squared_error(yint_test, yint_pred))
+print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
+print('Initial R^2 Score: %.2f' % r2_score(yint_test, yint_pred))
+print('Initial Mean Absolute Error: %.2f' % mean_absolute_error(yint_test, yint_pred))
 print('\n')
 
 #Repeating initial process to show improvements using additional dataset
@@ -50,9 +57,11 @@ model.fit(Xfin_train, yfin_train)
 
 yfin_pred = model.predict(Xfin_test)
 
-mse = mean_squared_error(yfin_test, yfin_pred)
-print('Final Evaluation:')
-print(f'Final Ridge Regression Mean Squared Error: {mse:.2f}')
+print("Final Evaluation:")
+print('Final Mean Squared Error: %.2f' % mean_squared_error(yfin_test, yfin_pred))
+print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
+print('Final R^2 Score: %.2f' % r2_score(yfin_test, yfin_pred))
+print('Final Mean Absolute Error: %.2f' % mean_absolute_error(yfin_test, yfin_pred))
 
 #Visualise coefficients and feature indexes on a bar chart
 plt.bar(range(len(model.coef_)), model.coef_)
