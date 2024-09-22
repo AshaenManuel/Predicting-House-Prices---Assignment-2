@@ -52,7 +52,7 @@ yfin_pred = model.predict(Xfin_test)
 
 print("Final Evaluation:")
 print('Final Mean Squared Error: %.2f' % mean_squared_error(yfin_test, yfin_pred))
-print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
+print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yfin_pred)))
 print('Final R^2 Score: %.2f' % r2_score(yfin_test, yfin_pred))
 print('Final Mean Absolute Error: %.2f' % mean_absolute_error(yfin_test, yfin_pred))
 

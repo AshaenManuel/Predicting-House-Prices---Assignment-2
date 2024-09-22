@@ -17,8 +17,6 @@ features = ['Bathroom', 'Number of Rooms', 'Distance', 'Number of Bedroom', 'Yea
 Xint = df[features]
 Xint_scaled = scaler.fit_transform(Xint)
 
-Xint_scaled = scaler.fit_transform(Xint)
-
 # Scale the target (Price)
 y = df['Price in $1,000,000']
 
@@ -59,7 +57,7 @@ yfin_pred = model.predict(Xfin_test)
 
 print("Final Evaluation:")
 print('Final Mean Squared Error: %.2f' % mean_squared_error(yfin_test, yfin_pred))
-print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
+print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yfin_pred)))
 print('Final R^2 Score: %.2f' % r2_score(yfin_test, yfin_pred))
 print('Final Mean Absolute Error: %.2f' % mean_absolute_error(yfin_test, yfin_pred))
 
