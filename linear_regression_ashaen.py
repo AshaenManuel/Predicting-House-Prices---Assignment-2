@@ -33,7 +33,7 @@ yint_pred = model.predict(Xint_test)
 # Print model performance
 print("Initial Evaluation:")
 print('Initial Mean Squared Error: %.2f' % mean_squared_error(yint_test, yint_pred))
-print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
+print('Initial Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
 print('Initial R^2 Score: %.2f' % r2_score(yint_test, yint_pred))
 print('Initial Mean Absolute Error: %.2f' % mean_absolute_error(yint_test, yint_pred))
 print('\n')
