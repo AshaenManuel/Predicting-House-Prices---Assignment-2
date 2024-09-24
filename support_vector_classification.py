@@ -33,6 +33,7 @@ model.fit(Xint_train, yint_train)
 yint_pred = model.predict(Xint_test)
 
 # Print model performance
+print("Initial Evaluation:")
 print(classification_report(yint_test, yint_pred))
 cm = confusion_matrix(yint_test, yint_pred)
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
@@ -50,12 +51,13 @@ Xfin_scaled = scaler.fit_transform(Xfin)
 Xfin_train, Xfin_test, yfin_train, yfin_test = train_test_split(Xfin_scaled, y, test_size=0.2, random_state=42)
 
 model = svm.SVC(kernel='rbf')
-model.fit(Xfin_train, yint_train)
+model.fit(Xfin_train, yfin_train)
 
 yfin_pred = model.predict(Xfin_test)
 
+print("Final Evaluation")
 print(classification_report(yfin_test, yfin_pred))
-cm = confusion_matrix(yint_test, yint_pred)
+cm = confusion_matrix(yfin_test, yfin_pred)
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
 plt.xlabel('Predicted')
 plt.ylabel('Actual')
