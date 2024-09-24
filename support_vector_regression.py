@@ -43,18 +43,18 @@ features = ['Bathroom', 'Number of Rooms', 'Distance', 'Number of Bedroom', 'Yea
 Xfin = df[features]
 Xfin_scaled = scaler.fit_transform(Xfin)
 
-Xfin_train, Xfin_test, yint_train, yint_test = train_test_split(Xfin_scaled, y, test_size=0.2, random_state=42)
+Xfin_train, Xfin_test, yfin_train, yfin_test = train_test_split(Xfin_scaled, y, test_size=0.2, random_state=42)
 
 model = svm.SVR()
-model.fit(Xfin_train, yint_train)
+model.fit(Xfin_train, yfin_train)
 
-yint_pred = model.predict(Xfin_test)
+yfin_pred = model.predict(Xfin_test)
 
 print('Final Evualtion:')
-print('Final Mean Squared Error: %.2f' % mean_squared_error(yint_test, yint_pred))
-print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yint_test, yint_pred)))
-print('Final R^2 Score: %.2f' % r2_score(yint_test, yint_pred))
-print('Final Mean Absolute Error: %.2f' % mean_absolute_error(yint_test, yint_pred))
+print('Final Mean Squared Error: %.2f' % mean_squared_error(yfin_test, yfin_pred))
+print('Final Root Mean Squared Error: %.2f' % math.sqrt(mean_squared_error(yfin_test, yfin_pred)))
+print('Final R^2 Score: %.2f' % r2_score(yfin_test, yfin_pred))
+print('Final Mean Absolute Error: %.2f' % mean_absolute_error(yfin_test, yfin_pred))
 
 
 # Visualize the results for just Bedrooms as a feature
