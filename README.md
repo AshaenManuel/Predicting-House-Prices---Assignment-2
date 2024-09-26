@@ -8,5 +8,5 @@ The dataset in the folder is already processed. Therefore, the processing.py fil
 
 Steps to run our model:
 
-1. Select the file which contains the training model you want to test.
+1. Select the file which contains the training model you want to test (linear_regression.py/ridge_regression.py/support_vector_classification.py).
 2. Run the file.
