@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {
-  AppBar, Toolbar, Typography, Container, Box, Button, Tab, Tabs,
-  TextField, Snackbar, Alert, Select, MenuItem
-} from '@mui/material';
+import { AppBar, Toolbar, Typography, Container, Box, Button, Tab, Tabs, Snackbar, Alert, TextField, IconButton, Fab } from '@mui/material';
+import Home from './components/Home';
+import Predict from './components/Predict';
+import About from './components/About';
+import Feedback from './components/Feedback';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import CloseIcon from '@mui/icons-material/Close';
 import suburbsData from './finaldata.json';
-import BarChart from './barchart';
-import PannableChart from './pannablechart';
 
 function App() {
   const [value, setValue] = useState(0);
@@ -19,11 +20,12 @@ function App() {
     population: '',
     educationScore: ''
   });
+
   const barChartData = Object.values(
     suburbsData.Sheet1.reduce((acc, item) => {
       const suburb = item.Suburb;
       const price = item['Price in $1,000,000'];
-  
+
       // Initialize the suburb entry in the accumulator if it doesn't exist
       if (!acc[suburb]) {
         acc[suburb] = {
@@ -34,19 +36,19 @@ function App() {
         // Accumulate the price for the existing suburb
         acc[suburb].totalPrice += price;
       }
-  
+
       return acc;
     }, {})
   )
-  .sort((a, b) => b.totalPrice - a.totalPrice) // Sort by total price in descending order
-  .slice(0, 5) // Get the top 5 suburbs
-  .map(item => ({ suburb: item.suburb, price: item.totalPrice }));
-  
+    .sort((a, b) => b.totalPrice - a.totalPrice) // Sort by total price in descending order
+    .slice(0, 10) // Get the top 10 suburbs
+    .map(item => ({ suburb: item.suburb, price: item.totalPrice }));
+
   const pannableChartData = Object.values(
     suburbsData.Sheet1.reduce((acc, item) => {
       const suburb = item.Suburb;
       const price = item['Price in $1,000,000'];
-  
+
       // Initialize the suburb entry in the accumulator if it doesn't exist
       if (!acc[suburb]) {
         acc[suburb] = {
@@ -57,21 +59,57 @@ function App() {
         // Accumulate the price for the existing suburb
         acc[suburb].totalPrice += price;
       }
-  
+
       return acc;
     }, {})
   )
-  .map(item => ({ suburb: item.suburb, price: item.totalPrice }));
-  
+    .map(item => ({ suburb: item.suburb, price: item.totalPrice }))
+    .sort((a, b) => a.suburb.localeCompare(b.suburb)); // Sort by suburb in alphabetical order  
+
+  const scatterPlotData = Object.values(
+    suburbsData.Sheet1.reduce((acc, item) => {
+      const suburb = item.Suburb;
+      const price = item['Price in $1,000,000'];
+      const educationScore = item['Education Score'];
+
+      // Initialize the suburb entry in the accumulator if it doesn't exist
+      if (!acc[suburb]) {
+        acc[suburb] = {
+          suburb: suburb,
+          totalPrice: price, // Start with the current price
+          totalEducationScore: educationScore, // Start with the current education score
+          count: 1 // Start count at 1
+        };
+      } else {
+        // Accumulate price and education score, and increment count for existing suburb
+        acc[suburb].totalPrice += price;
+        acc[suburb].totalEducationScore += educationScore;
+        acc[suburb].count += 1;
+      }
+
+      return acc;
+    }, {})
+  )
+    .map(item => ({
+      suburb: item.suburb,
+      averagePrice: item.totalPrice / item.count, // Calculate average price
+      averageEducationScore: item.totalEducationScore / item.count // Calculate average education score
+    }));
+
   const [suburbs, setSuburbs] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackData, setFeedbackData] = useState({
+    name: '',
+    feedback: ''
+  });
 
   useEffect(() => {
     const suburbList = suburbsData.Sheet1.map((item) => item.Suburb);
     const uniqueSuburbs = [...new Set(suburbList)].sort();
     setSuburbs(uniqueSuburbs);
   }, []);
-  
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -133,24 +171,45 @@ function App() {
     setSnackbarOpen(false);
   };
 
+  // Handle Feedback Click (opens the feedback Snackbar)
+  const handleFeedbackClick = () => {
+    setFeedbackOpen(true);
+  };
+
+  // Handle Feedback Input Change
+  const handleFeedbackInputChange = (event) => {
+    const { name, value } = event.target;
+    setFeedbackData({ ...feedbackData, [name]: value });
+  };
+
+  // Handle Feedback Submission
+  const handleFeedbackSubmit = () => {
+    if (feedbackData.name === '' || feedbackData.feedback === '') {
+      alert('Please provide both name and feedback.');
+      return;
+    }
+
+    // Here you can send the feedback to an email or backend
+    alert(`Feedback submitted!\nName: ${feedbackData.name}\nFeedback: ${feedbackData.feedback}`);
+
+    // Reset feedback data and close the Snackbar
+    setFeedbackData({ name: '', feedback: '' });
+    setFeedbackOpen(false);
+  };
+
+  // Handle closing the feedback Snackbar
+  const handleFeedbackClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setFeedbackOpen(false);
+  };
+
   return (
     <Container component="main" sx={{ padding: 0 }}>
-      <Typography 
-        variant="h2" 
-        component="h1" 
-        gutterBottom 
-        align="center" 
-        sx={{ 
-          backgroundColor: 'primary.main', 
-          color: 'white', 
-          p: 2, 
-          marginBottom: 0
-        }}
-      >
+      <Typography variant="h2" component="h1" gutterBottom align="center" sx={{backgroundColor: 'primary.main', color: 'white', p: 2, marginBottom: 0}}>
         Melbourne Housing Price Predictor
       </Typography>
       <AppBar position="static" sx={{ backgroundColor: 'primary.main', marginTop: 0 }}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'center', border: '1px solid black'}}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'center', border: '1px solid black' }}>
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'space-around' }}>
             <Tabs value={value} onChange={handleChange} textColor="inherit">
               <Tab label="Home" />
@@ -160,171 +219,83 @@ function App() {
           </Box>
         </Toolbar>
       </AppBar>
-      
-      {value === 0 && ( // Home Tab
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h5" align="center">
-            Welcome to the Melbourne Housing Price Predictor!
-          </Typography>
-          <Typography variant="body1" align="center" sx={{ mt: 2 }}>
-            This application helps you predict housing prices based on various parameters such as suburb, number of rooms, number of bedrooms,
-            number of bathrooms, distance from the CBD, year built, population and education score.
-          </Typography>
-          <Typography variant="body1" align="center" sx={{ mt: 2 }}>
-            The barchart below shows the top 5 most expensive suburbs based on the accumulated cost of houses in each suburb.
-          </Typography>
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-            <BarChart data={barChartData} />
-          </Box>
-        </Box>
-      )}
-
-      {value === 1 && ( // Predict Tab
-        <Box sx={{ mt: 4 }}>
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              backgroundColor: 'primary.light', 
-              padding: 1, 
-              textAlign: 'center'
-            }}
-          >
-            Enter Data of the House for Prediction
-          </Typography>
-          <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-            <Select
-              value={formData.suburb}
-              onChange={handleInputChange}
-              name="suburb"
-              displayEmpty
-              variant="outlined"
-            >
-              <MenuItem value="" disabled>
-                Select Suburb
-              </MenuItem>
-              {suburbs.map((suburb, index) => (
-                <MenuItem key={index} value={suburb}>
-                  {suburb}
-                </MenuItem>
-              ))}
-            </Select>
-            <TextField
-              label="Number of Rooms"
-              variant="outlined"
-              type="number"
-              name="rooms"
-              value={formData.rooms}
-              onChange={handleInputChange}
-              slotProps={{
-                htmlInput: {
-                  min: 1,
-                  max: 8
-                }
-              }}
-            />
-            <TextField
-              label="Number of Bedrooms"
-              variant="outlined"
-              type="number"
-              name="bedrooms"
-              value={formData.bedrooms}
-              onChange={handleInputChange}
-              slotProps={{
-                htmlInput: {
-                  min: 0,
-                  max: 10
-                }
-              }}
-            />
-            <TextField
-              label="Number of Bathrooms"
-              variant="outlined"
-              type="number"
-              name="bathrooms"
-              value={formData.bathrooms}
-              onChange={handleInputChange}
-              slotProps={{
-                htmlInput: {
-                  min: 0,
-                  max: 6
-                }
-              }}
-            />
-            <TextField
-              label="Distance (km) from CBD"
-              variant="outlined"
-              type="number"
-              name="distance"
-              value={formData.distance}
-              onChange={handleInputChange}
-              slotProps={{
-                htmlInput: {
-                  min: 1,
-                }
-              }}
-            />
-            <TextField
-              label="Year Built"
-              variant="outlined"
-              type="number"
-              name="year"
-              value={formData.year}
-              onChange={handleInputChange}
-              slotProps={{
-                htmlInput: {
-                  max: 2024,
-                }
-              }}
-            />
-            <TextField
-              label="Population"
-              variant="outlined"
-              type="number"
-              name="population"
-              value={formData.population}
-              onChange={handleInputChange}
-              slotProps={{
-                htmlInput: {
-                  min: 1,
-                }
-              }}
-            />
-            <TextField
-              label="Education Score"
-              variant="outlined"
-              type="number"
-              name="educationScore"
-              value={formData.educationScore}
-              onChange={handleInputChange}
-              slotProps={{
-                htmlInput: {
-                  min: 1,
-                }
-              }}
-            />
-            <Button variant="contained" sx={{ mt: 2, mb: 4 }} onClick={handleSubmit}>Predict</Button>
-          </Box>
-        </Box>
-      )}
-
-      {value === 2 && ( // About Tab
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h5" align="center">
-            About This App
-          </Typography>
-          <Typography variant="body1" align="center" sx={{ mt: 2 }}>
-            The Melbourne Housing Price Predictor was built by Ashaen, Disen and Tri. We started with planning out our project, then made our 
-            Machine Learning Model to be able to predict housing prices, and then made this website to let users test our model.
-          </Typography>
-        </Box>
-      )}
-
+      {value === 0 && <Home barChartData={barChartData} pannableChartData={pannableChartData} scatterPlotData={scatterPlotData} />}
+      {value === 1 && <Predict formData={formData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} suburbs={suburbs} />}
+      {value === 2 && <About />}
+      <Feedback open={snackbarOpen} onClose={handleSnackbarClose} />
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
           Prediction submitted successfully!
         </Alert>
       </Snackbar>
+      <Snackbar
+        open={feedbackOpen}
+        autoHideDuration={null} // Stay open until manually closed
+        onClose={handleFeedbackClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Box sx={{ p: 2, backgroundColor: 'white', borderRadius: 1, width: '300px', border: '1px solid black'}}>
+          <Typography variant="h6" sx={{ mb: 2 }}>Submit Feedback</Typography>
+          <TextField
+            label="Name"
+            fullWidth
+            variant="outlined"
+            name="name"
+            value={feedbackData.name}
+            onChange={handleFeedbackInputChange}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Feedback"
+            fullWidth
+            variant="outlined"
+            name="feedback"
+            value={feedbackData.feedback}
+            onChange={handleFeedbackInputChange}
+            multiline
+            rows={3}
+            sx={{ mb: 2 }}
+          />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleFeedbackSubmit}
+            >
+              Submit
+            </Button>
+            <IconButton color="inherit" onClick={handleFeedbackClose}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </Box>
+      </Snackbar>
+      <Fab
+        color="secondary"
+        aria-label="feedback"
+        sx={{
+          position: 'fixed',
+          bottom: 16,
+          right: 16,
+        }}
+        onClick={handleFeedbackClick}
+      >
+        <FeedbackIcon />
+      </Fab>
+      <Box component="footer" sx={{ py: 6, mt: 'auto', textAlign: 'center' }}>
+        <Container maxWidth="lg">
+          <Typography variant="body1">
+            Predicting Housing Prices: Group05-05-Not Like Us
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {'Copyright © '}
+            {new Date().getFullYear()}
+            {'.'}
+          </Typography>
+        </Container>
+      </Box>
     </Container>
+
   );
 }
 
