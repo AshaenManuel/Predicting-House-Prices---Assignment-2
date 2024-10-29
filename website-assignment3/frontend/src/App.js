@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Container, Box, Button, Tab, Tabs, Snackbar, Alert, TextField, IconButton, Fab } from '@mui/material';
+import { AppBar, Toolbar, Typography, Container, Box, Button, Tab, Tabs, Snackbar, Alert, TextField, IconButton, Fab, Paper } from '@mui/material';
 import Home from './components/Home';
 import Predict from './components/Predict';
 import About from './components/About';
@@ -7,8 +7,14 @@ import Feedback from './components/Feedback';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import CloseIcon from '@mui/icons-material/Close';
 import suburbsData from './finaldata.json';
+import {Line} from 'react-chartjs-2'
+import axios from 'axios';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 function App() {
+
   const [value, setValue] = useState(0);
   const [formData, setFormData] = useState({
     suburb: '',
@@ -130,7 +136,17 @@ function App() {
     }
   };
 
-  const handleSubmit = () => {
+  const [predictedPrice, setPredictedPrice] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [chartData, setChartData] = useState(null);
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    setError('');
+    setPredictedPrice(null);
+    setLoading(true);
+
     if (formData.rooms < 1 || formData.rooms > 8) {
       alert("Number of rooms must be between 1 and 8.");
       return;
@@ -159,6 +175,50 @@ function App() {
       alert("Education Score must be greater than 0.");
       return;
     }
+
+    try {
+      // Axios call to the backend to predict house price
+     const response = await axios.get(`http://localhost:8000/predict/${formData.bathrooms}/${formData.rooms}/${formData.distance}/${formData.bedrooms}/${formData.year}/${formData.population}/${formData.educationScore}`);
+     setPredictedPrice(response.data.predicted_price);
+     
+     const distance = [10, 20, 30, 40, 50];
+     const predictions = await Promise.all(
+      distance.map(dis =>
+        axios.get(`http://localhost:8000/predict/${dis}/${formData.bathrooms}/${formData.rooms}/${formData.bedrooms}/${formData.year}/${formData.population}/${formData.educationScore}`)
+          .then(res => res.data.predicted_price)
+      )
+     );
+
+     const newChartData ={
+      labels: distance, // X-axis labels (square footage)
+        datasets: [
+          {
+            label: 'Predicted Prices in $ millions',
+            data: predictions,  // Y-axis data (predicted prices)
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            tension: 0.1
+          },
+          {
+            label: 'Your Prediction',
+            data: [{x: parseInt(formData.distance), y: response.data.predicted_price}],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            pointRadius: 8,
+            pointHoverRadius: 12,
+            showLine: false // Show only the point for the user's prediction
+          }
+        ]
+      };
+
+      setChartData(newChartData);  // Set the chart data in state
+     
+   } catch (err) {
+     setError('Error predicting price. Please try again.');
+     console.error(err);
+   } finally {
+     setLoading(false);
+   }
     // Proceed with form submission
     console.log(formData);
     setSnackbarOpen(true);
@@ -170,6 +230,9 @@ function App() {
     }
     setSnackbarOpen(false);
   };
+
+  
+
 
   // Handle Feedback Click (opens the feedback Snackbar)
   const handleFeedbackClick = () => {
@@ -220,7 +283,49 @@ function App() {
         </Toolbar>
       </AppBar>
       {value === 0 && <Home barChartData={barChartData} pannableChartData={pannableChartData} scatterPlotData={scatterPlotData} />}
-      {value === 1 && <Predict formData={formData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} suburbs={suburbs} />}
+      {value === 1 && <Predict formData={formData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} suburbs={suburbs}/>}
+      {predictedPrice && (
+            <Paper elevation={3} sx={{ p: 3 }}>
+              <Typography variant="h5" gutterBottom>
+                Predicted Price: ${predictedPrice.toLocaleString()}
+              </Typography>
+              {chartData && (
+                <Box sx={{ mt: 3 }}>
+                  <Line 
+                    data={chartData}
+                    options={{
+                      responsive: true,
+                      plugins: {
+                        legend: {
+                          position: 'top',
+                        },
+                        title: {
+                          display: true,
+                          text: 'Price Predictions by Distance'
+                        }
+                      },
+                      scales: {
+                        x: {
+                          type: 'linear',
+                          position: 'bottom',
+                          title: {
+                            display: true,
+                            text: 'Distance'
+                          }
+                        },
+                        y: {
+                          title: {
+                            display: true,
+                            text: 'Predicted Price ($)'
+                          }
+                        }
+                      }
+                    }}
+                  />
+                </Box>
+              )}
+            </Paper>
+          )}
       {value === 2 && <About />}
       <Feedback open={snackbarOpen} onClose={handleSnackbarClose} />
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
