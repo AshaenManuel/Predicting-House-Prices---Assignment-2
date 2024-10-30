@@ -20,7 +20,7 @@ const About = () => {
             To provide a brief overview of how this website was created, we started with deciding who was gonna do which section of this full-stack
             web development assignment. We decided that Ashaen would do the front end, Disen back end, and Tri would do the AI model intergration. To
             create the front end, we used React JS, D3.JS, MUI to provide a clean, intuitive and professional look to the user. For the back end, we used
-            Fast API, to connect the front end to the back end.
+            Fast API, to connect the front end to the back end and then AI integration to connect the variables from the front end to the back end and return the predicted price and the chart.
           </Typography>
           <Typography variant="body1" align="center" sx={{ mt: 2 }}>
             Some features of this website include, the ability for users to interact with 3 charts: Zoomable Bar Chart, Pannable Bar Chart, and 

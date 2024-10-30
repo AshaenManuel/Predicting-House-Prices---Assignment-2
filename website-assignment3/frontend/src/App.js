@@ -111,6 +111,7 @@ function App() {
   });
 
   useEffect(() => {
+    document.title = "Melbourne Housing Price Predictor";
     const suburbList = suburbsData.Sheet1.map((item) => item.Suburb);
     const uniqueSuburbs = [...new Set(suburbList)].sort();
     setSuburbs(uniqueSuburbs);
@@ -146,7 +147,11 @@ function App() {
     setError('');
     setPredictedPrice(null);
     setLoading(true);
-
+    
+    if (!formData.suburb) {
+      alert("Please select a suburb.");
+      return;
+    }
     if (formData.rooms < 1 || formData.rooms > 8) {
       alert("Number of rooms must be between 1 and 8.");
       return;

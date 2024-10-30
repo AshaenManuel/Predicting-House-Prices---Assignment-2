@@ -4,6 +4,12 @@
     stroke-width: 2px;
   }
   
-  .unselected {
+.unselected {
     fill: steelblue;
-  }
+}
+
+.chart-container {
+  width: 100%;
+  height: auto;
+  position: relative;
+}
