@@ -11,10 +11,11 @@ import {Line} from 'react-chartjs-2'
 import axios from 'axios';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
+// Register chart components with ChartJS
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 function App() {
-
+  // State to manage tab selection, form inputs, and chart data
   const [value, setValue] = useState(0);
   const [formData, setFormData] = useState({
     suburb: '',
@@ -27,6 +28,7 @@ function App() {
     educationScore: ''
   });
 
+  // Data preparation for bar, pannable, and scatter plots
   const barChartData = Object.values(
     suburbsData.Sheet1.reduce((acc, item) => {
       const suburb = item.Suburb;
@@ -101,7 +103,8 @@ function App() {
       averagePrice: item.totalPrice / item.count, // Calculate average price
       averageEducationScore: item.totalEducationScore / item.count // Calculate average education score
     }));
-
+  
+  // State for suburb list, feedback, snackbar notifications, and chart data
   const [suburbs, setSuburbs] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -110,6 +113,7 @@ function App() {
     feedback: ''
   });
 
+  // Fetch unique suburbs on component mount
   useEffect(() => {
     document.title = "Melbourne Housing Price Predictor";
     const suburbList = suburbsData.Sheet1.map((item) => item.Suburb);
@@ -117,11 +121,12 @@ function App() {
     setSuburbs(uniqueSuburbs);
   }, []);
 
-
+  // Handle tab change
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
+  // Handle form input change with validation for specific fields
   const handleInputChange = (event) => {
     const { name, value } = event.target;
 
@@ -137,11 +142,13 @@ function App() {
     }
   };
 
+  // State to store predicted price and error/loading indicators
   const [predictedPrice, setPredictedPrice] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState(null);
 
+  // Form submission handler for making prediction request
   const handleSubmit = async(e) => {
     e.preventDefault();
     setError('');
@@ -183,16 +190,17 @@ function App() {
 
     try {
       // Axios call to the backend to predict house price
-     const response = await axios.get(`http://localhost:8000/predict/${formData.bathrooms}/${formData.rooms}/${formData.distance}/${formData.bedrooms}/${formData.year}/${formData.population}/${formData.educationScore}`);
-     setPredictedPrice(response.data.predicted_price);
-     
-     const distance = [10, 20, 30, 40, 50];
-     const predictions = await Promise.all(
-      distance.map(dis =>
-        axios.get(`http://localhost:8000/predict/${dis}/${formData.bathrooms}/${formData.rooms}/${formData.bedrooms}/${formData.year}/${formData.population}/${formData.educationScore}`)
-          .then(res => res.data.predicted_price)
-      )
-     );
+      const response = await axios.get(`http://localhost:8000/predict/${formData.bathrooms}/${formData.rooms}/${formData.distance}/${formData.bedrooms}/${formData.year}/${formData.population}/${formData.educationScore}`);
+      setPredictedPrice(response.data.predicted_price);
+
+      // Create data for line chart showing predictions at various distances
+      const distance = [10, 20, 30, 40, 50];
+      const predictions = await Promise.all(
+        distance.map(dis =>
+          axios.get(`http://localhost:8000/predict/${dis}/${formData.bathrooms}/${formData.rooms}/${formData.bedrooms}/${formData.year}/${formData.population}/${formData.educationScore}`)
+            .then(res => res.data.predicted_price)
+        )
+      );
 
      const newChartData ={
       labels: distance, // X-axis labels (square footage)
@@ -229,15 +237,13 @@ function App() {
     setSnackbarOpen(true);
   };
 
+  // Snackbar and Feedback Handlers
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setSnackbarOpen(false);
   };
-
-  
-
 
   // Handle Feedback Click (opens the feedback Snackbar)
   const handleFeedbackClick = () => {
@@ -257,7 +263,6 @@ function App() {
       return;
     }
 
-    // Here you can send the feedback to an email or backend
     alert(`Feedback submitted!\nName: ${feedbackData.name}\nFeedback: ${feedbackData.feedback}`);
 
     // Reset feedback data and close the Snackbar
@@ -271,6 +276,7 @@ function App() {
     setFeedbackOpen(false);
   };
 
+  // App's component layout with AppBar, Tab Panels, and Snackbar for form notifications
   return (
     <Container component="main" sx={{ padding: 0 }}>
       <Typography variant="h2" component="h1" gutterBottom align="center" sx={{backgroundColor: 'primary.main', color: 'white', p: 2, marginBottom: 0}}>
@@ -289,7 +295,7 @@ function App() {
       </AppBar>
       {value === 0 && <Home barChartData={barChartData} pannableChartData={pannableChartData} scatterPlotData={scatterPlotData} />}
       {value === 1 && <Predict formData={formData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} suburbs={suburbs}/>}
-      {predictedPrice && (
+      {value === 1 && predictedPrice && (
             <Paper elevation={3} sx={{ p: 3 }}>
               <Typography variant="h5" gutterBottom>
                 Predicted Price: ${predictedPrice.toLocaleString()}
