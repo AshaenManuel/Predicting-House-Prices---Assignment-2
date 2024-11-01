@@ -15,7 +15,7 @@ const Home = ({ barChartData, pannableChartData, scatterPlotData }) => {
         number of bathrooms, distance from the CBD, year built, population and education score.
       </Typography>
       <Typography variant="body1" align="center" sx={{ mt: 2 }}>
-        The barchart below shows the top 5 most expensive suburbs based on the accumulated cost of houses in each suburb.
+        The barchart below shows the top 10 most expensive suburbs based on the accumulated cost of houses in each suburb.
       </Typography>
       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
         {barChartData && barChartData.length > 0 ? (
