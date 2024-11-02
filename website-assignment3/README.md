@@ -1,14 +1,14 @@
-#Melbourne Housing Price Predictor#
+# Melbourne Housing Price Predictor #
 
 This project is a web-based application that predicts housing prices in Melbourne based on various property features. It includes data visualization, a user-friendly input form, and a prediction model using Support Vector Regression (SVR) to estimate property prices.
 
-##Project Structure##
+## Project Structure ##
 
 Frontend: A React application for the user interface, form inputs, and interactive data visualizations.
 Backend: A FastAPI application to handle prediction requests, integrate the AI model, and provide a REST API for the frontend.
 AI Model: An SVR model to process and predict housing prices based on user inputs.
 
-###Set Up Instructions###
+### Set Up Instructions ###
 
 1. Download the Project File System
 2. Install Node.js
@@ -18,7 +18,7 @@ AI Model: An SVR model to process and predict housing prices based on user input
 6. Run `uvicorn main:app --reload`. This will run the backend server.
 7. Navigate to the frontend directory and type `npm start`. This will start the website.
 
-###How to Use the Website###
+### How to Use the Website ###
 
 1. In the Home page, you can interact with the charts.
 2. In the Predict page, you can submit data to predict a housing price
