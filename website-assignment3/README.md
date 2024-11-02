@@ -12,6 +12,7 @@ AI Model: An SVR model to process and predict housing prices based on user input
 
 1. Download the Project File System
 2. Install Node.js
+3. If havent already, include the node_modules folder in the frontend directory.
 3. Using pip and npm commands, install python, material ui, d3.js, chart.js, fastapi, uvicorn, scikit-learn, joblib, pandas, numpy
 4. If there are anymore libraries missing, please install them as recommended
 5. Navigate to the backend directory and type `python model.py`. This will train the model and generate simple_model.pkl and scaler.pkl if havent already and set up AI model integration.
